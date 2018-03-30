@@ -11,7 +11,7 @@ document.getElementById('add').onclick = function() {
 
 document.getElementById('item').addEventListener('keypress', function(e) {
     var newTask = document.getElementById('item').value;
-    if(e.keyCode === 13 && newTask !== '') {
+    if((event.which == 13 || event.keyCode == 13) && newTask !== '') {
         addTask(newTask);
         document.getElementById('item').value = '';
     }
