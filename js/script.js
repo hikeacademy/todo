@@ -156,6 +156,6 @@ function completeItem() {
  * so that we have their values stores in localStorage.
  */
 function updateStorage() {
-    localStorage.setItem('todo', JSON.stringify(todo));
+    localStorage.setItem('todos', JSON.stringify(todos));
     localStorage.setItem('completed', JSON.stringify(completed));
 }
