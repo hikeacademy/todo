@@ -177,7 +177,11 @@ ul.todo li .buttons button.complete svg {
   transition: background 0.2s ease;
 }
 
-ul.todo#completed li .buttons button.complete svg {
+ul.todo#completed-list li {
+  text-decoration: line-through;
+}
+
+ul.todo#completed-list li .buttons button.complete svg {
   background: #25b99a;
   border: 0px;
 }
@@ -190,7 +194,7 @@ ul.todo li .buttons button.complete:hover svg .fill {
   fill: #fff;
 }
 
-ul.todo#completed li .buttons button.complete svg .fill {
+ul.todo#completed-list li .buttons button.complete svg .fill {
   fill: #fff;
 }
 
@@ -210,12 +214,12 @@ ul.todo li .buttons button.complete svg .fill {
   fill: #25b99a;
 }
 
-ul.todo#completed {
+ul.todo#completed-list {
   position: relative;
   padding: 60px 0 0 0;
 }
 
-ul.todo#completed::before {
+ul.todo#completed-list::before {
   content: '';
   width: 150px;
   height: 1px;

@@ -1,47 +1,84 @@
 'use strict';
 
+// Icons for remove and complete buttons
 const removeIcon = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve"><rect class="noFill" width="22" height="22"/><g><g><path class="fill" d="M16.1,3.6h-1.9V3.3c0-1.3-1-2.3-2.3-2.3h-1.7C8.9,1,7.8,2,7.8,3.3v0.2H5.9c-1.3,0-2.3,1-2.3,2.3v1.3c0,0.5,0.4,0.9,0.9,1v10.5c0,1.3,1,2.3,2.3,2.3h8.5c1.3,0,2.3-1,2.3-2.3V8.2c0.5-0.1,0.9-0.5,0.9-1V5.9C18.4,4.6,17.4,3.6,16.1,3.6z M9.1,3.3c0-0.6,0.5-1.1,1.1-1.1h1.7c0.6,0,1.1,0.5,1.1,1.1v0.2H9.1V3.3z M16.3,18.7c0,0.6-0.5,1.1-1.1,1.1H6.7c-0.6,0-1.1-0.5-1.1-1.1V8.2h10.6V18.7z M17.2,7H4.8V5.9c0-0.6,0.5-1.1,1.1-1.1h10.2c0.6,0,1.1,0.5,1.1,1.1V7z"/></g><g><g><path class="fill" d="M11,18c-0.4,0-0.6-0.3-0.6-0.6v-6.8c0-0.4,0.3-0.6,0.6-0.6s0.6,0.3,0.6,0.6v6.8C11.6,17.7,11.4,18,11,18z"/></g><g><path class="fill" d="M8,18c-0.4,0-0.6-0.3-0.6-0.6v-6.8c0-0.4,0.3-0.6,0.6-0.6c0.4,0,0.6,0.3,0.6,0.6v6.8C8.7,17.7,8.4,18,8,18z"/></g><g><path class="fill" d="M14,18c-0.4,0-0.6-0.3-0.6-0.6v-6.8c0-0.4,0.3-0.6,0.6-0.6c0.4,0,0.6,0.3,0.6,0.6v6.8C14.6,17.7,14.3,18,14,18z"/></g></g></g></svg>';
 const completeIcon = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve"><rect y="0" class="noFill" width="22" height="22"/><g><path class="fill" d="M9.7,14.4L9.7,14.4c-0.2,0-0.4-0.1-0.5-0.2l-2.7-2.7c-0.3-0.3-0.3-0.8,0-1.1s0.8-0.3,1.1,0l2.1,2.1l4.8-4.8c0.3-0.3,0.8-0.3,1.1,0s0.3,0.8,0,1.1l-5.3,5.3C10.1,14.3,9.9,14.4,9.7,14.4z"/></g></svg>';
 
+/*
+ * Initialize arrays containing ToDo Itens.
+ * If localStorage already contained stored itens, the arrays are initialized
+ * to the stored value. Otherwise, they are initialized to be empty arrays.
+ */
 const todos = (localStorage.getItem('todos') ? JSON.parse(localStorage.getItem('todos')) : []);
 const completed = (localStorage.getItem('completed') ? JSON.parse(localStorage.getItem('completed')) : []);
 
-loadTasks();
+loadItens();
 
+/*
+ * When 'add' button is clicked, it should add to the list an item with the
+ * text inside the input field. The item is only added if the text inside the
+ * input field is not empty.
+ */
 document.getElementById('add').onclick = function() {
-    const newTask = document.getElementById('item').value;
-    if(newTask) {
-        addTask(newTask);
+    const itemText = document.getElementById('item-text').value;
+    if(itemText) {
+        addItemToDOM(itemText);
+        document.getElementById('item-text').value = '';
+        todos.push(itemText);
+        
+        updateStorage();
     }
 };
 
-document.getElementById('item').addEventListener('keypress', function(event) {
-    const newTask = document.getElementById('item').value;
-    if((event.which === 13 || event.keyCode === 13) && newTask !== '') {
-        addTask(newTask);
+/*
+ * When user hits 'Enter' over the input field, it should add to the list an
+ * item with the text inside the input field. The item is only added if the
+ * text inside the input field is not empty.
+ */
+document.getElementById('item-text').addEventListener('keypress', function(event) {
+    let itemText = document.getElementById('item-text').value;
+    if((event.which === 13 || event.keyCode === 13) && itemText !== '') {
+        addItemToDOM(itemText);
+        document.getElementById('item-text').value = '';
+        todos.push(itemText);
+        
+        updateStorage();
     }
 });
 
-function addTask(task) {
-    addItemToDOM(task);
-    document.getElementById('item').value = '';
-    todos.push(task);
-    updateStorage();
-}
-
-function loadTasks() {
-    for(let i = 0; i < todos.length; i += 1) {
-        addItemToDOM(todos[i], false);
+/*
+ * Loads the Todo Lists with the elements inside the arrays.
+ */
+function loadItens() {
+    for(let i = 0; i < todos.length; i = i + 1) {
+        addItemToDOM(todos[i]);
     }
 
-    for(let i = 0; i < completed.length; i += 1) {
+    for(let i = 0; i < completed.length; i = i + 1) {
         addItemToDOM(completed[i], true);
     }
 }
 
-function addItemToDOM(task, completed) {
+/*
+ * Given a string, creates an item with the format
+ * <li>
+ *     Item Text
+ *     <div class="buttons">
+ *         <button class="remove">
+ *             <svg></svg>
+ *         </button>
+ *         <button class="complete">
+ *             <svg></svg>
+ *         </button>
+ *     </div>
+ * </li>
+ * Note we omit the SVG code.
+ * The function also takes a boolean that determines whether the item
+ * should go in the completed list.
+ */
+function addItemToDOM(itemText, completed) {
     const item = document.createElement('li');
-    item.innerText = task;
+    item.innerText = itemText;
 
     const buttons = document.createElement('div');
     buttons.classList.add('buttons');
@@ -49,30 +86,34 @@ function addItemToDOM(task, completed) {
     const removeButton = document.createElement('button');
     removeButton.classList.add('remove');
     removeButton.innerHTML = removeIcon;
-    removeButton.addEventListener('click', removeItem);
+    removeButton.onclick = removeItem;
 
     const completeButton = document.createElement('button');
     completeButton.classList.add('complete');
     completeButton.innerHTML = completeIcon;
-    completeButton.addEventListener('click', changeItemComplete);
+    completeButton.onclick = completeItem;
 
     buttons.append(removeButton);
     buttons.append(completeButton);
     item.append(buttons);
 
-    const listId = (completed ? 'completed' : 'todo');
+    // Define the liust in which the item should go to based on the boolean.
+    const listId = (completed ? 'completed-list' : 'todo-list');
 
     document.getElementById(listId).prepend(item);
 }
 
+/*
+ * Removes the item whose remove button called the function.
+ */
 function removeItem() {
-    const item = this.parentNode.parentNode;
-    const text = item.innerText;
-    const currentListId = item.parentNode.id;
+    let item = this.parentNode.parentNode;
+    let text = item.innerText;
+    let currentListId = item.parentNode.id;
 
     item.remove();
 
-    if(currentListId === 'todo') {
+    if(currentListId === 'todo-list') {
         todos.splice(todos.indexOf(text), 1);
     } else {
         completed.splice(completed.indexOf(text), 1);
@@ -81,27 +122,40 @@ function removeItem() {
     updateStorage();
 }
 
-function changeItemComplete() {
-    const item = this.parentNode.parentNode;
-    const currentListId = item.parentNode.id;
-    const text = item.innerText;
+/*
+ * Change the complete state of the item whose complete button called the
+ * function.
+ * If the item is being marked as completed, we remove it from the ToDo List
+ * and array, and put it in the Completed List and array. If the item is being
+ * marked as incomplete, we do the opposite.
+ */
+function completeItem() {
+    let item = this.parentNode.parentNode;
+    let currentListId = item.parentNode.id;
+    let text = item.innerText;
 
     item.remove();
 
-    if(currentListId === 'todo') {
+    if(currentListId === 'todo-list') {
         todos.splice(todos.indexOf(text), 1);
         completed.push(text);
-        document.getElementById('completed').prepend(item);
+        document.getElementById('completed-list').prepend(item);
     } else {
-        completed.splice(todos.indexOf(text), 1);
+        completed.splice(completed.indexOf(text), 1);
         todos.push(text);
-        document.getElementById('todo').prepend(item);
+        document.getElementById('todo-list').prepend(item);
     }
 
     updateStorage();
 }
 
+/*
+ * Sets the localStorage values to be the ones currently present in the
+ * arrays.
+ * This function should be called every time we update either of the arrays
+ * so that we have their values stores in localStorage.
+ */
 function updateStorage() {
-    localStorage.setItem('todos', JSON.stringify(todos));
+    localStorage.setItem('todo', JSON.stringify(todo));
     localStorage.setItem('completed', JSON.stringify(completed));
 }
